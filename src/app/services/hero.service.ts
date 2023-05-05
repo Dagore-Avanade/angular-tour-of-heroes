@@ -2,13 +2,22 @@ import { Injectable } from '@angular/core';
 import Hero from '../interfaces/Hero';
 import { Observable, catchError, pipe, tap, throwError } from 'rxjs';
 import { MessageService } from './message.service';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeroService {
   private apiURL = 'https://localhost:7087/api/heroes';
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    }),
+  };
 
   constructor(
     private readonly messageService: MessageService,
@@ -27,6 +36,15 @@ export class HeroService {
       tap(() => this.log(`Fetched hero with id ${id}`)),
       catchError(this.handleError)
     );
+  }
+
+  updateHero(hero: Hero): Observable<void> {
+    return this.http
+      .put<void>(`${this.apiURL}/${hero.id}`, hero, this.httpOptions)
+      .pipe(
+        tap(() => this.log(`Updated hero with id ${hero.id}`)),
+        catchError(this.handleError)
+      );
   }
 
   private handleError(err: HttpErrorResponse): Observable<never> {

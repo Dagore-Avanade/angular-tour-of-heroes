@@ -35,6 +35,17 @@ export class HeroDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  save(): void {
+    if (this.hero) {
+      this.heroService
+        .updateHero(this.hero)
+        .pipe(takeUntil(this.stop$))
+        .subscribe({
+          next: () => this.goBack(),
+        });
+    }
+  }
+
   goBack(): void {
     this.location.back();
   }
